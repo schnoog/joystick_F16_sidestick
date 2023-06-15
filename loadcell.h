@@ -9,14 +9,14 @@ int MID_Y = 512;
  
 int MAXVALUE=1023; 
 
-int LIMIT_X[3] = {5,400 , 450 };
-int LIMIT_Y[3] = {5,400 , 450 };
+int LIMIT_X[3] = {15,400 , 450 };
+int LIMIT_Y[3] = {15,400 , 450 };
 
 int VALUE_X;
 int VALUE_Y;
 int Axis1;
 int Axis2;
-int DeadZone = 5;
+int DeadZone = 15;
 
 int Center_Axis1 = 0;
 int Center_Axis2 = 0;
@@ -75,11 +75,23 @@ int GetCorrectedValue(int rawvalue, int center){
   return Output;
 }
 
-
+void CalcluateLEDState(){
+  int DiffX = abs(Center_Axis1 - VALUE_X);
+  int DiffY = abs(Center_Axis2 - VALUE_Y);
+  LEDSTATE = 0;
+  int XState = 0;
+  int YState = 0;
+  for(int i = 0; i < 3 ; i++){
+    if (DiffX > LIMIT_X[i]) XState = i + 1;
+    if (DiffY > LIMIT_Y[i]) YState = i + 1;
+  }
+  LEDSTATE = max(YState,XState);
+}
 
 void ReadLoadCell(){
   VALUE_X = ReadAxis(1); 
   VALUE_Y = ReadAxis(2);
   CorrectedAxis1 = GetCorrectedValue(VALUE_X, Center_Axis1);
   CorrectedAxis2 = GetCorrectedValue(VALUE_Y, Center_Axis2);
+  CalcluateLEDState();
 }

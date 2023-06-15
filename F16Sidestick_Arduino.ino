@@ -13,6 +13,7 @@
 #include <Wire.h>
 #include "Adafruit_MCP23017.h"
 //#include "ADS1X15.h"
+#include "leds.h"
 #include "loadcell.h"
 
 //ADS1115 ADS(0x48);
@@ -50,7 +51,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(6, INPUT);
 //  while (!Serial); // Leonardo: wait for serial monitor
-
+  LED_setup();
   mcp1.begin(addr1);      // use default address 0
   mcp2.begin(addr2);
 
@@ -145,6 +146,7 @@ void loop() {
     GetAxis();
     GetButtons();
     Joystick.sendState();
+    ApplyState();
   //Serial.println("Loop");
  // MCP_LoopA(); 
  //   ADS_Loop();
