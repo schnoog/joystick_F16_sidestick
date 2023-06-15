@@ -13,6 +13,7 @@
 #include <Wire.h>
 #include "Adafruit_MCP23017.h"
 //#include "ADS1X15.h"
+#include "loadcell.h"
 
 //ADS1115 ADS(0x48);
 
@@ -47,6 +48,7 @@ unsigned long debounce_time[32];
 ///---setup
 void setup() {
   Serial.begin(9600);
+  pinMode(6, INPUT);
 //  while (!Serial); // Leonardo: wait for serial monitor
 
   mcp1.begin(addr1);      // use default address 0
@@ -74,7 +76,7 @@ void setup() {
 
     Joystick.setXAxisRange( 1023, 0);
     Joystick.setYAxisRange(0, 1023);
-  
+    GetCenter();  
 }
 
 ///----setup
@@ -101,8 +103,10 @@ void GetAxis(){
 //        int AX = (int)ADS.readADC(0);
 //        int AY = (int)ADS.readADC(1);
         //analogReference(INTERNAL);
-        int AX =  analogRead(0);
-        int AY = analogRead(1);
+        ReadLoadCell();
+
+        int AX =  CorrectedAxis1;
+        int AY = CorrectedAxis2;
         Joystick.setXAxis(AX);
         Joystick.setYAxis(AY);  
         debug("Axis: ");
@@ -127,7 +131,17 @@ void debounceVal(int BtnNum, int CurrentVal){
 
 
 
+int buttonState = 0;
+
 void loop() {
+  buttonState = digitalRead(6);
+  if (buttonState == 0){
+      debugln("recalib");
+      delay(2000);
+      GetCenter(); 
+      debugln("done");
+
+  }
     GetAxis();
     GetButtons();
     Joystick.sendState();
