@@ -11,6 +11,9 @@
 #include <FastLED.h>
 CRGB leds[NUM_LEDS];
 
+int SetRed = 0;
+int SetBlue = 0;
+int SetGreen = 0;
 
 #define ALARM_OFF 50
 #define ALARM_ON 100
@@ -41,9 +44,15 @@ void ApplyState(){
     //memcpy(array2, array1, sizeof(array1));
     //color_set = color_noinput;
     memcpy(color_set, color_noinput, sizeof(color_noinput));
-    if(LEDSTATE == 1) memcpy(color_set, color_ok, sizeof(color_ok));   
+    if(LEDSTATE == 1) {
+      memcpy(color_set, color_ok, sizeof(color_ok));
+      color_set[0] = SetRed;
+      color_set[1] = SetGreen;
+      color_set[2] = SetBlue;
+    }
+
     if(LEDSTATE == 2) memcpy(color_set, color_limit, sizeof(color_limit)); 
-    if(LEDSTATE == 3){ 
+    if(LEDSTATE == 3){
       if( (millis() - LastLEDRun) > AlarmTime ){
         if(Alertstate){
                 memcpy(color_set, color_limit, sizeof(color_limit)); 

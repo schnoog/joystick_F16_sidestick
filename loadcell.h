@@ -1,5 +1,6 @@
 #pragma once
 
+#include "leds.h"
 
 int CorrectedAxis1;
 int CorrectedAxis2;
@@ -76,8 +77,8 @@ int GetCorrectedValue(int rawvalue, int center){
 }
 
 void CalcluateLEDState(){
-  int DiffX = abs(Center_Axis1 - VALUE_X);
-  int DiffY = abs(Center_Axis2 - VALUE_Y);
+  int DiffX = abs(MID_X - CorrectedAxis1);
+  int DiffY = abs(MID_Y - CorrectedAxis2);
   LEDSTATE = 0;
   int XState = 0;
   int YState = 0;
@@ -86,6 +87,18 @@ void CalcluateLEDState(){
     if (DiffY > LIMIT_Y[i]) YState = i + 1;
   }
   LEDSTATE = max(YState,XState);
+  if(LEDSTATE == 1){
+      int mdiff = max(DiffX,DiffY);
+      SetGreen = map(mdiff,0,512,0,255);
+      int rdiff = 512 - mdiff;
+      SetRed = map(rdiff,0,512,0,5);
+      SetBlue = map(rdiff,0,512,0,125);
+
+
+  }
+
+
+
 }
 
 void ReadLoadCell(){

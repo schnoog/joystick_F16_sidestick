@@ -113,7 +113,20 @@ void GetAxis(){
         debug("Axis: ");
         debug(AX);
         debug(" ,  ");
-        debugln(AY);   
+        debug(AY);
+        debug("   Raw:");
+        debug(VALUE_X);
+        debug(" (");
+        debug(Center_Axis1);
+        debug(") ");
+        debug(" ,  ");
+        debug(VALUE_Y);
+        debug(" (");
+        debug(Center_Axis2);
+        debug(") ");
+
+        debug(" Voltage:");
+        debugln(analogRead(A2));   
 }
 
 void debounceVal(int BtnNum, int CurrentVal){
