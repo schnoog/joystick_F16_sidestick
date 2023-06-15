@@ -1,5 +1,6 @@
 #pragma once
-
+#include "settings.h"
+#include "init.h"
 #include "leds.h"
 
 int CorrectedAxis1;
@@ -91,8 +92,8 @@ void CalcluateLEDState(){
       int mdiff = max(DiffX,DiffY);
       SetGreen = map(mdiff,0,512,0,255);
       int rdiff = 512 - mdiff;
-      SetRed = map(rdiff,0,512,0,5);
-      SetBlue = map(rdiff,0,512,0,125);
+      SetRed = map(mdiff,0,512,0,25);
+      SetBlue = map(mdiff,0,512,0,25);
 
 
   }

@@ -1,22 +1,7 @@
 #pragma once
-
-
-#define LED_PIN     5
-#define NUM_LEDS    3
-#define BRIGHTNESS  128
-#define LED_TYPE    WS2812B
-#define COLOR_ORDER GRB
-#define UPDATES_PER_SECOND 100
-
 #include <FastLED.h>
 CRGB leds[NUM_LEDS];
 
-int SetRed = 0;
-int SetBlue = 0;
-int SetGreen = 0;
-
-#define ALARM_OFF 50
-#define ALARM_ON 100
 
 int LEDSTATE = 3;
 long LastDebugTime = 0;
@@ -24,10 +9,6 @@ unsigned long LastLEDRun = 0;
 bool Alertstate = false;
 unsigned long AlarmTime  = 0;
 
-int color_noinput[3] = {0,0,0};
-int color_alert[3] = { 255,0,0};
-int color_ok[3] = { 34,139,34};
-int color_limit[3] = { 255,84,0};
 
 
 void LED_setup() {
