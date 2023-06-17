@@ -8,18 +8,33 @@ int CorrectedAxis2;
 
 int MID_X = 512;
 int MID_Y = 512;
- 
-int MAXVALUE=1023; 
+
+
+
+
+
+
+
+
 
 int LIMIT_X[3] = {15,400 , 450 };
 int LIMIT_Y[3] = {15,400 , 450 };
+
+int MAXVALUE=1023; 
+int CENTERVALUE = 512;
+int MINVALUE=0;
+
 
 int VALUE_X;
 int VALUE_Y;
 int Axis1;
 int Axis2;
-int DeadZone = 15;
 
+
+int DeadZone = 15;
+int EndZones = 13;
+int InputLimit_Upper = MAXVALUE - EndZones ;
+int InputLimit_Lower = MINVALUE + EndZones ;
 int Center_Axis1 = 0;
 int Center_Axis2 = 0;
 
@@ -59,19 +74,25 @@ void GetCenter(){
   Serial.println("Center-Run Axis2: Sum:" + (String)Sum + " in 100 runs");
 }
 
+int ClearEndZone(int rawvalue){
+    if (rawvalue > InputLimit_Upper) rawvalue = InputLimit_Upper;
+    if(rawvalue < InputLimit_Lower) rawvalue = InputLimit_Lower;
+    return rawvalue;
+}
 
 int GetCorrectedValue(int rawvalue, int center){
-    int Output = 512;
+    rawvalue  = ClearEndZone(rawvalue); 
+    int Output = CENTERVALUE;
+    int CalcValue = 0;
     int RWD = abs( rawvalue - center );
     if (RWD > DeadZone){
-      if(rawvalue > center){
-          if (rawvalue > 1010) rawvalue = 1010; 
-          Output = map(rawvalue,center,1010,513,1023);
-      }
-
       if(rawvalue < center){
-          if(rawvalue < 13) rawvalue = 13;
-          Output = map(rawvalue,13,center,0,511);
+          CalcValue = map(rawvalue, InputLimit_Lower, center - DeadZone ,InputLimit_Lower,CENTERVALUE - 1);
+          Output = map(CalcValue,InputLimit_Lower,center,MINVALUE,CENTERVALUE - 1);
+      }
+      if(rawvalue > center){
+          CalcValue = map(rawvalue, center + DeadZone,InputLimit_Upper,CENTERVALUE + 1 ,InputLimit_Upper);
+          Output = map(CalcValue,center,InputLimit_Upper,CENTERVALUE + 1,MAXVALUE);
       }
     }
   return Output;
