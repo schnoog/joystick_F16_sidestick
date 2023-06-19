@@ -9,6 +9,10 @@
 #define debugln(x) 
 #endif
 
+int StartAxisOutputAtCycle = 500;
+int CyclesSinceCalib =0;
+
+
 
 #include <Joystick.h>
 #include <Wire.h>

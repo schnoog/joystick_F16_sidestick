@@ -1,3 +1,4 @@
+#include "WString.h"
 #pragma once
 #include "settings.h"
 #include "init.h"
@@ -57,7 +58,9 @@ int ReadAxis(int Num){
 void GetCenter(){
   long Sum = 0;
   long tmp = 0;
-
+  int CalDiff1 = 0;
+  int CalDiff2 = 0;
+  int NewDeadZone = 0;
   int cnt = 0;
   for(cnt = 0; cnt < 100; cnt++){
       Sum += (long)ReadAxis(1);
@@ -72,6 +75,36 @@ void GetCenter(){
   tmp = Sum / 100;
   Center_Axis2 = (int) tmp;
   Serial.println("Center-Run Axis2: Sum:" + (String)Sum + " in 100 runs");
+
+
+// get deadzone
+  int CurrDiff = 0;
+  Sum = 0;
+  for(cnt = 0; cnt < 500; cnt++){
+      CurrDiff = abs(ReadAxis(1) - Center_Axis1);
+      if(CurrDiff > CalDiff1) CalDiff1 = CurrDiff;
+  }
+  CurrDiff = 0;
+  for(cnt = 0; cnt < 500; cnt++){
+      CurrDiff = abs(ReadAxis(2) - Center_Axis2);
+      if(CurrDiff > CalDiff2) CalDiff2 = CurrDiff;
+  }
+
+
+  NewDeadZone = max(CalDiff1,CalDiff2);
+  if(NewDeadZone < 15){ 
+    NewDeadZone = 15;
+  }else{
+    NewDeadZone += 5;
+  }
+  DeadZone = NewDeadZone;
+  Serial.println("Deadzone: 1:" + (String)CalDiff1 + " 2:" + (String)CalDiff2 + " new deadzone set to " + (String)DeadZone);
+  CyclesSinceCalib = 0;
+
+
+
+
+
 }
 
 int ClearEndZone(int rawvalue){

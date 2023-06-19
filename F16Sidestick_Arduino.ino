@@ -73,6 +73,9 @@ void GetAxis(){
         int AY = CorrectedAxis2;
         Joystick.setXAxis(AX);
         Joystick.setYAxis(AY);  
+
+        if(CyclesSinceCalib > StartAxisOutputAtCycle){
+
         debug("Axis: ");
         debug(AX);
         debug(" ,  ");
@@ -89,7 +92,10 @@ void GetAxis(){
         debug(") ");
 
         debug(" Voltage:");
-        debugln(analogRead(A2));   
+        debugln(analogRead(A2));  
+        }else{
+          CyclesSinceCalib++;
+        } 
 }
 
 void debounceVal(int BtnNum, int CurrentVal){
