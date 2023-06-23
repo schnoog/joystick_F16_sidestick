@@ -1,14 +1,16 @@
+#include "Arduino.h"
 #include "WString.h"
 #pragma once
 #include "settings.h"
 #include "init.h"
 #include "leds.h"
+#include "MyADS.h"
 
 int CorrectedAxis1;
 int CorrectedAxis2;
 
-int MID_X = 512;
-int MID_Y = 512;
+int MID_X = 13500;
+int MID_Y = 13500;
 
 
 
@@ -18,11 +20,11 @@ int MID_Y = 512;
 
 
 
-int LIMIT_X[3] = {15,400 , 450 };
-int LIMIT_Y[3] = {15,400 , 450 };
+int LIMIT_X[3] = {15,13300 , 13450 };
+int LIMIT_Y[3] = {15,13300 , 13450 };
 
-int MAXVALUE=1023; 
-int CENTERVALUE = 512;
+int MAXVALUE=27000; 
+int CENTERVALUE = 13500;
 int MINVALUE=0;
 
 
@@ -32,15 +34,17 @@ int Axis1;
 int Axis2;
 
 
-int DeadZone = 15;
-int EndZones = 13;
+int DeadZone = 25;
+int EndZones = 80;
 int InputLimit_Upper = MAXVALUE - EndZones ;
 int InputLimit_Lower = MINVALUE + EndZones ;
 int Center_Axis1 = 0;
 int Center_Axis2 = 0;
 
-
-
+long CalCyclesNum = 20;
+long CalCycleEnd = 0;
+long SumA = 0;
+long SumB = 0;
 
 int InvertData(int Given){
   return MAXVALUE - Given;
@@ -48,64 +52,16 @@ int InvertData(int Given){
 
 int ReadAxis(int Num){
   if(Num == 1){
-    return InvertData(analogRead(A1));
+    return (int)val0[0];
+//    return InvertData(analogRead(A1));
   }
   if(Num == 2){
-    return InvertData(analogRead(A0));
+    return (int)val0[1];
+//    return InvertData(analogRead(A0));
   }
 }
 
-void GetCenter(){
-  long Sum = 0;
-  long tmp = 0;
-  int CalDiff1 = 0;
-  int CalDiff2 = 0;
-  int NewDeadZone = 0;
-  int cnt = 0;
-  for(cnt = 0; cnt < 100; cnt++){
-      Sum += (long)ReadAxis(1);
-  }
-  Serial.println("Center-Run Axis1: Sum:" + (String)Sum + " in 100 runs");
-  tmp = Sum / 100;
-  Center_Axis1 = (int) tmp;
-  Sum = 0;
-  for(cnt = 0; cnt < 100; cnt++){
-      Sum += (long)ReadAxis(2);
-  }
-  tmp = Sum / 100;
-  Center_Axis2 = (int) tmp;
-  Serial.println("Center-Run Axis2: Sum:" + (String)Sum + " in 100 runs");
 
-
-// get deadzone
-  int CurrDiff = 0;
-  Sum = 0;
-  for(cnt = 0; cnt < 500; cnt++){
-      CurrDiff = abs(ReadAxis(1) - Center_Axis1);
-      if(CurrDiff > CalDiff1) CalDiff1 = CurrDiff;
-  }
-  CurrDiff = 0;
-  for(cnt = 0; cnt < 500; cnt++){
-      CurrDiff = abs(ReadAxis(2) - Center_Axis2);
-      if(CurrDiff > CalDiff2) CalDiff2 = CurrDiff;
-  }
-
-
-  NewDeadZone = max(CalDiff1,CalDiff2);
-  if(NewDeadZone < 15){ 
-    NewDeadZone = 15;
-  }else{
-    NewDeadZone += 5;
-  }
-  DeadZone = NewDeadZone;
-  Serial.println("Deadzone: 1:" + (String)CalDiff1 + " 2:" + (String)CalDiff2 + " new deadzone set to " + (String)DeadZone);
-  CyclesSinceCalib = 0;
-
-
-
-
-
-}
 
 int ClearEndZone(int rawvalue){
     if (rawvalue > InputLimit_Upper) rawvalue = InputLimit_Upper;
@@ -162,4 +118,52 @@ void ReadLoadCell(){
   CorrectedAxis1 = GetCorrectedValue(VALUE_X, Center_Axis1);
   CorrectedAxis2 = GetCorrectedValue(VALUE_Y, Center_Axis2);
   CalcluateLEDState();
+}
+
+void GetCenter(){
+  SumA = 0;
+  SumB = 0;
+  long tmp = 0;
+  int CalDiff1 = 0;
+  int CalDiff2 = 0;
+  long NewDeadZone = 0;
+  long cnt = 0;
+  long oldCC = ADSCycles;
+  long minA = 32000;
+  long minB = 32000;
+  long maxA = 0;
+  long maxB = 0;
+  while(Center_Axis1 < 1){
+      MyAdsloop();
+      debug(".");
+      if(ADSCycles != oldCC){
+        debugln("");
+        cnt++;
+          Serial.println("New Analog values");
+          SumA = SumA + (long)val0[0];
+          if((long)val0[0] > maxA) maxA = (long)val0[0];
+          if((long)val0[0] < minA) minA = (long)val0[0];
+          SumB = SumB + (long)val0[1];
+          if((long)val0[1] > maxB) maxB = (long)val0[1];
+          if((long)val0[1] < minB) minB = (long)val0[1];          
+          oldCC = ADSCycles;
+          debugln("Calcycle: " + (String)cnt + " Sums: " + (String)SumA + " / " + (String)SumB);
+      }
+      if(cnt == CalCyclesNum){
+        tmp = SumA / CalCyclesNum;
+        Center_Axis1 = (int) tmp;
+        debugln("Center-Run Axis1: Sum:" + (String)SumA + " in " + (String)CalCyclesNum  +" runs");
+        tmp = SumB / CalCyclesNum;
+        Center_Axis2 = (int) tmp;
+        debugln("Center-Run Axis1: Sum:" + (String)SumB + " in " + (String)CalCyclesNum  +" runs");
+        long t1 = 0;
+        long t2 = 0;
+        t1 = maxA - minA;
+        t2 = maxB - minB;
+        DeadZone = max((int)t1, (int)t2) * 2;
+        debugln("New deadzone :" + (String)DeadZone);
+ 
+      }
+  }
+
 }

@@ -12,7 +12,7 @@
 ///---setup
 void setup() {
   Serial.begin(9600);
-  pinMode(6, INPUT);
+  pinMode(6, INPUT_PULLUP);
 //  while (!Serial); // Leonardo: wait for serial monitor
   LED_setup();
   mcp1.begin(addr1);      // use default address 0
@@ -24,6 +24,7 @@ void setup() {
           mcp2.pinMode(i, INPUT);
           mcp2.pullUp(i, HIGH);  // turn on a 100K pullup internally
     }
+    ADS_Setup();
 //    ADS.begin();
 //    ADS.setGain(0);
 // if(!adc.init()){
@@ -38,8 +39,8 @@ void setup() {
 //    Joystick.setXAxisRange( BaseReadX + MidOff, BaseReadX - MidOff);
 //    Joystick.setYAxisRange(BaseReadY - MidOff, BaseReadY + MidOff);
 
-    Joystick.setXAxisRange( 1023, 0);
-    Joystick.setYAxisRange(0, 1023);
+    Joystick.setXAxisRange( 27000, 0);
+    Joystick.setYAxisRange(0, 27000);
     GetCenter();  
 }
 
@@ -64,9 +65,13 @@ void GetButtons(){
 }
 
 void GetAxis(){
+
+
+
 //        int AX = (int)ADS.readADC(0);
 //        int AY = (int)ADS.readADC(1);
         //analogReference(INTERNAL);
+        MyAdsloop();
         ReadLoadCell();
 
         int AX =  CorrectedAxis1;
@@ -92,7 +97,7 @@ void GetAxis(){
         debug(") ");
 
         debug(" Voltage:");
-        debugln(analogRead(A2));  
+        debugln(val0[3]);  
         }else{
           CyclesSinceCalib++;
         } 
@@ -120,6 +125,8 @@ void loop() {
   if (buttonState == 0){
       debugln("recalib");
       delay(2000);
+      Center_Axis1 = 0;
+      Center_Axis2 = 0;
       GetCenter(); 
       debugln("done");
 

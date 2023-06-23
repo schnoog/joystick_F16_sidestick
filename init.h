@@ -20,7 +20,7 @@ int CyclesSinceCalib =0;
 //#include "ADS1X15.h"
 #include "leds.h"
 #include "loadcell.h"
-
+#include "MyADS.h"
 
 Adafruit_MCP23017 mcp1;
 Adafruit_MCP23017 mcp2;
