@@ -22,7 +22,7 @@ beside the F16 Grip & Adapter
 * **1x Top plate** (Joyplate.dxf) 
 
 I ordered the aluminum parts at Xometry made out of 3mm sheets of EN AW-6060 / 3.3206 / Al-MgSi
-All 4 parts in the folder Hardware\Metal_parts together came with a total order value of ? 68.78
+All 4 parts in the folder Hardware\Metal_parts together came with a total order value of  68.78 Euro
 
 **Other**
 
@@ -44,7 +44,7 @@ The lid has small ramps to which I attached 4 WS2812B LEDs I cut from a strip I 
 
 ### Electronics
 
-* **Arduino Micro Pro (Clone)** If you need to buy one, be sure to buy one with 5V (there are 3.3V and 5V available) and USB-C socket (the damn micro USB sockets are only SMD attached to the circuit boad and rip off easily)
+* **Arduino Pro Micro (Clone)** If you need to buy one, be sure to buy one with 5V (there are 3.3V and 5V available) and USB-C socket (the damn micro USB sockets are only SMD attached to the circuit boad and rip off easily)
 
 * **1x ADS1115 16bit ADC Modul** for example by AZ delivery. But there are dozen other manucaturers which use the same board layout (ADS1115.jpg)
 ![ADS1115](Hardware/ADS1115.jpg)
