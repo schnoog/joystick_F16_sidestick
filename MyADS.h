@@ -7,7 +7,7 @@ int16_t val0[4] = { 0, 0, 0, 0 };
 int     idx = 0;
 uint32_t lastTime = 0;
 long ADSCycles = 0;
-
+unsigned long lastfullread = 0;
 //new center 13865
 
 void ADS_request_all()
@@ -22,7 +22,12 @@ bool ADS_read_all()
   if (val0[idx]  < 0 ) val0[idx] = 0;
   if (val0[idx] > 27000)val0[idx] = 27000;
  // val0[idx] = map(val0[idx],0,27000,0,1023);
-  if(idx == 3) ADSCycles++;
+  if(idx == 3){
+     ADSCycles++;
+     unsigned long CDuration = millis() - lastfullread;
+     debugln("Full Cycle: " + (String)CDuration );
+     lastfullread = millis();
+  }
   if(ADSCycles > 32000) ADSCycles = 0;
 
   idx++;
@@ -32,6 +37,7 @@ bool ADS_read_all()
     return true;
   }
   idx = 0;
+  ADS_request_all();
   return false;
 }
 
@@ -39,6 +45,7 @@ bool ADS_read_all()
 void ADS_Setup(){
   ADS0.begin();
   Serial.println(ADS0.isConnected());
+  //ADS0.setMode(0);
   ADS0.setDataRate(4);  // 0 = slow   4 = medium   7 = fast but more noise
   idx = 0;
   ADS_request_all();  

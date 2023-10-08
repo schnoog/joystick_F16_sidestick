@@ -9,7 +9,7 @@
 #define debugln(x) 
 #endif
 
-int StartAxisOutputAtCycle = 500;
+int StartAxisOutputAtCycle = 5;
 int CyclesSinceCalib =0;
 
 
@@ -29,7 +29,7 @@ int buttonState = 0;
 
 Joystick_ Joystick(0x03,
   //  joystickType          buttonCount   hatSwitchCount  
-  JOYSTICK_TYPE_JOYSTICK,     32,            0,
+  JOYSTICK_TYPE_JOYSTICK,     35,            0,
   //includeXAxis includeYAxis includeZAxis includeRxAxis includeRyAxis includeRzAxis
        true,         true,       false,       false,        false,        false,
   //includeRudder  includeThrottle includeAccelerator includeBrake includeSteering
@@ -37,10 +37,10 @@ Joystick_ Joystick(0x03,
 //Joystick_ Joystick(0x03);
 
 
-byte switch_state[32];
-byte switch_state_old[32];
+byte switch_state[35];
+byte switch_state_old[35];
 byte reading, clk, clk_old, realpin, realbutton;
-unsigned long debounce_time[32];
+unsigned long debounce_time[35];
 
 
 

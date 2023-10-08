@@ -12,7 +12,7 @@ int CorrectedAxis2;
 int MID_X = 13500;
 int MID_Y = 13500;
 
-
+int MinDeadZone = 800;
 
 
 
@@ -29,22 +29,25 @@ int MINVALUE=0;
 
 
 int VALUE_X;
+int OLD_VALUE_X =0;
 int VALUE_Y;
+int OLD_VALUE_Y = 0;
 int Axis1;
 int Axis2;
 
 
 int DeadZone = 25;
-int EndZones = 80;
+int EndZones = 160;
 int InputLimit_Upper = MAXVALUE - EndZones ;
 int InputLimit_Lower = MINVALUE + EndZones ;
 int Center_Axis1 = 0;
 int Center_Axis2 = 0;
 
-long CalCyclesNum = 20;
+long CalCyclesNum = 50;
 long CalCycleEnd = 0;
 long SumA = 0;
 long SumB = 0;
+int RepeatedCal = 0;
 
 int InvertData(int Given){
   return MAXVALUE - Given;
@@ -75,13 +78,15 @@ int GetCorrectedValue(int rawvalue, int center){
     int CalcValue = 0;
     int RWD = abs( rawvalue - center );
     if (RWD > DeadZone){
-      if(rawvalue < center){
+      if(rawvalue < center - DeadZone){
           CalcValue = map(rawvalue, InputLimit_Lower, center - DeadZone ,InputLimit_Lower,CENTERVALUE - 1);
-          Output = map(CalcValue,InputLimit_Lower,center,MINVALUE,CENTERVALUE - 1);
+          //   rohwert  von 0+160 bis 13500-160  --> auf 0+160  bis 13499
+          Output = map(rawvalue,InputLimit_Lower,center - DeadZone,MINVALUE,CENTERVALUE - 1);
+          //  calc   von 0+160 bis 13500 auf 0 bis 13499
       }
-      if(rawvalue > center){
+      if(rawvalue > center + DeadZone){
           CalcValue = map(rawvalue, center + DeadZone,InputLimit_Upper,CENTERVALUE + 1 ,InputLimit_Upper);
-          Output = map(CalcValue,center,InputLimit_Upper,CENTERVALUE + 1,MAXVALUE);
+          Output = map(rawvalue,center + DeadZone,InputLimit_Upper,CENTERVALUE + 1,MAXVALUE);
       }
     }
   return Output;
@@ -115,9 +120,19 @@ void CalcluateLEDState(){
 void ReadLoadCell(){
   VALUE_X = ReadAxis(1); 
   VALUE_Y = ReadAxis(2);
-  CorrectedAxis1 = GetCorrectedValue(VALUE_X, Center_Axis1);
-  CorrectedAxis2 = GetCorrectedValue(VALUE_Y, Center_Axis2);
-  CalcluateLEDState();
+  int Changed = 0;
+  if(VALUE_X != OLD_VALUE_X){
+    CorrectedAxis1 = GetCorrectedValue(VALUE_X, Center_Axis1);
+    OLD_VALUE_X = VALUE_X;
+    Changed++;
+  }
+  if(VALUE_Y != OLD_VALUE_Y){
+    CorrectedAxis2 = GetCorrectedValue(VALUE_Y, Center_Axis2);
+    OLD_VALUE_Y = VALUE_Y;
+    Changed++;
+  }
+
+  if(Changed >0) CalcluateLEDState();
 }
 
 void GetCenter(){
@@ -133,7 +148,15 @@ void GetCenter(){
   long minB = 32000;
   long maxA = 0;
   long maxB = 0;
+  SetGreen = 255;
+  SetRed = 255;
+  SetBlue = 255;
+  LEDSTATE = 1;    
+  ApplyState();
   while(Center_Axis1 < 1){
+
+
+
       MyAdsloop();
       debug(".");
       if(ADSCycles != oldCC){
@@ -160,8 +183,14 @@ void GetCenter(){
         long t2 = 0;
         t1 = maxA - minA;
         t2 = maxB - minB;
+        if(RepeatedCal > 0){
         DeadZone = max((int)t1, (int)t2) * 2;
+        if(DeadZone < MinDeadZone) DeadZone = MinDeadZone;
         debugln("New deadzone :" + (String)DeadZone);
+        }else{
+          DeadZone = MinDeadZone;
+        }
+        RepeatedCal++;
  
       }
   }

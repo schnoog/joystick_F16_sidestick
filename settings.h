@@ -8,7 +8,7 @@ const uint8_t addr2 = 1; // Adresse 0x21 / 1
 
 
 #define LED_PIN     5
-#define NUM_LEDS    3
+#define NUM_LEDS    4
 #define BRIGHTNESS  128
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB

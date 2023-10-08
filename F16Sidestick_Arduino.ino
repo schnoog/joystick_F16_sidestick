@@ -6,13 +6,15 @@
 
 
 
-
+long LPS=0;
 
 
 ///---setup
 void setup() {
   Serial.begin(9600);
   pinMode(6, INPUT_PULLUP);
+  pinMode(7, INPUT_PULLUP);
+  pinMode(14, INPUT_PULLUP);
 //  while (!Serial); // Leonardo: wait for serial monitor
   LED_setup();
   mcp1.begin(addr1);      // use default address 0
@@ -62,6 +64,25 @@ void GetButtons(){
             debounceVal(ButtonB,(int) !mcp2.digitalRead(s));
             ButtonB++;
         }
+        int CV = 0;
+        CV = (int) !digitalRead(7);
+        if( CV != 0){
+            if(LPS == 0) LPS = millis();
+            long NOW = millis();
+            int WT = 200;
+            if( abs(NOW - LPS) > 700 ){
+                    Joystick.setButton(33,1);
+                    Joystick.sendState();
+                    delay(WT);
+                    Joystick.setButton(33,0);
+                    Joystick.sendState();
+                    delay(WT/2);
+               
+            }
+        }else{
+          LPS=0;
+        } 
+        debounceVal(34, (int) !digitalRead(14));
 }
 
 void GetAxis(){
@@ -97,7 +118,12 @@ void GetAxis(){
         debug(") ");
 
         debug(" Voltage:");
-        debugln(val0[3]);  
+        debug(val0[3]);
+        int DZD1 = abs(Center_Axis1 - VALUE_X);
+        int DZD2 = abs(Center_Axis2 - VALUE_Y);
+
+        debugln(" Deadzone:" + (String)DeadZone + " diff: " + (String)DZD1 + " " + (String)DZD2 );
+
         }else{
           CyclesSinceCalib++;
         } 

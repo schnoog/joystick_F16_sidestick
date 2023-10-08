@@ -52,7 +52,7 @@ void ApplyState(){
     }
 
 
-    for(int LED = 0 ; LED < 3 ; LED++){
+    for(int LED = 0 ; LED < 4 ; LED++){
       leds[LED].r = color_set[0];
       leds[LED].g = color_set[1];
       leds[LED].b = color_set[2];
