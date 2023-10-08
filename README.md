@@ -1,6 +1,6 @@
 # My F16 Sidestick
 
-![Kiku](JoyStick.jpg)
+![Joystick](Hardware/JoyStick.jpg)
 
 This repository holds (almost) all the information about my DIY F16 Force Sensing Sidestick I use mainly in DCS
 
