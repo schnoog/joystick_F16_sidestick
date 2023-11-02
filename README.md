@@ -49,10 +49,14 @@ The lid has small ramps to which I attached 4 WS2812B LEDs I cut from a strip I 
 * **1x ADS1115 16bit ADC Modul** for example by AZ delivery. But there are dozen other manucaturers which use the same board layout (ADS1115.jpg)
 ![ADS1115](Hardware/ADS1115.jpg)
 * **2x MCP 23017 IO Expander moduls**  
+* **2x INA 122P instrument amplifier** (I used sockets, but can be soldered directly to the PCB
+* **1x Potentiometer >=10k type  3296 - 3/8 ? Square Trimpot** 
+* **2x Potentiometer (same 3296 type, but 100 or 200 Ohm)**
+
 
 * **1x Base PCB** That's the printed circuit board which holds all components in the base. 
 ![PCB](Hardware/PCB_3D.jpg)
-
+(the PCB has some additional ports, for up to 4 analog and 8 digital inputs, I connected 3 additional digital inputs to buttons. One for recalibration of the center position and noise and 2 for ingame functions)
 
 **Stick internal wiring**
 
